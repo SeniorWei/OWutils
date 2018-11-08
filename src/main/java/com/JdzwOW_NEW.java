@@ -117,11 +117,11 @@ public class JdzwOW_NEW {
 
     public static void main(String[] args) throws IOException {
 
-//        JdzwOW_NEW a = new JdzwOW_NEW("","","");
+//        JdzwOW_NEW a = new JdzwOW_NEW("","","");     //直接new对象
 
 
 
-        JdzwOW_NEW a =utils.getConnection();
+        JdzwOW_NEW a =utils.getConnection();         //从root.properties中获取参数来new对象
 
         while (true){
             try {
