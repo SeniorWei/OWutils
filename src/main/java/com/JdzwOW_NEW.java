@@ -46,7 +46,7 @@ public class JdzwOW_NEW {
     public String OW_execute() throws Exception {
         // 全局请求设置
         RequestConfig globalConfig = RequestConfig.custom()
-                .setConnectTimeout(10000)
+                .setConnectTimeout(120000)
                 .setSocketTimeout(10000)
                 .setCookieSpec(CookieSpecs.STANDARD).build();
         // 创建cookie store的本地实例
@@ -71,7 +71,7 @@ public class JdzwOW_NEW {
 
             log.info(ShowHttpResponseEntity(res));  //显示应答
 
-            if(Login_OW(PublicPost, httpClient, res, context)==false){     //登陆
+            if(!Login_OW(PublicPost, httpClient, res, context)){     //登陆
                 throw new Exception("账号密码错误");
             }
             log.info(SiginIN_OW(PublicPost, httpClient, res, context));    //签到
@@ -88,10 +88,22 @@ public class JdzwOW_NEW {
 
             log.info(Hook_TimeHeartOW(PublicPost, httpClient, res, context,Host)); //维持挂机心跳包
         }finally {
-            if(res!=null)
-                res.close();
-            if(httpClient!=null)
-            httpClient.close();
+            try {
+                if(res!=null){
+                    res.close();
+                }
+            } catch (IOException e) {
+                log.error(e);
+            }
+
+            try {
+                if(httpClient!=null){
+                    httpClient.close();
+                }
+            } catch (IOException e) {
+                log.error(e);
+            }
+
 
         }
 
@@ -106,14 +118,19 @@ public class JdzwOW_NEW {
     public static void main(String[] args) throws IOException {
 
 //        JdzwOW_NEW a = new JdzwOW_NEW("","","");
+
+
+
         JdzwOW_NEW a =utils.getConnection();
 
         while (true){
             try {
                 a.OW_execute();
             }catch (Exception e) {
-                e.printStackTrace();
                 log.error("顶层异常：" + e);
+//                for (int i = 0; i < e.getStackTrace().length; i++) {
+//                    log.error(e.getStackTrace()[i]);
+//                }
                     if(e.getMessage().equals("账号密码错误")){
                         return;
                     }
@@ -327,10 +344,13 @@ public class JdzwOW_NEW {
 
         response = httpclient.execute(CookieGet, context);
 
-        if(response!=null){
-            response.close();
+        try {
+            if(response!=null){
+                response.close();
+            }
+        } catch (IOException e) {
+            log.error(e);
         }
-
 
 
         CookieGet = new HttpGet(Host+"/TCG/GameOnHook.aspx");
@@ -365,16 +385,24 @@ public class JdzwOW_NEW {
                     TimeHeart.put("imgBtnQuit.y", "10");
                     log.info("最后的心跳包：");
                     HookDoPost(Host+"/TCG/GameOnHook.aspx", TimeHeart, post, httpclient, response, context);
-                    if(response!=null){
-                        response.close();
+                    try {
+                        if(response!=null){
+                            response.close();
+                        }
+                    } catch (IOException e) {
+                        log.error(e);
                     }
                     break;
                 }
 
                 log.info("第" + count + "次心跳包");
                 HookDoPost(Host+"/TCG/GameOnHook.aspx", TimeHeart, post, httpclient, response, context);
-                if(response!=null){
-                    response.close();
+                try {
+                    if(response!=null){
+                        response.close();
+                    }
+                } catch (IOException e) {
+                    log.error(e);
                 }
 
                 xx -= 180;
@@ -384,8 +412,12 @@ public class JdzwOW_NEW {
             } catch (Exception e) {
                 log.error("心跳包异常：" + e);
             }finally {
-                if(response!=null){
-                    response.close();
+                try {
+                    if(response!=null){
+                        response.close();
+                    }
+                } catch (IOException e) {
+                    log.error(e);
                 }
             }
 
@@ -418,8 +450,6 @@ public class JdzwOW_NEW {
                 log.warn("状态码： " + response.getStatusLine().getStatusCode());
             }
 
-        }catch (Exception e){
-            log.error("发送POST异常：" + e);
         }finally {
             if(response!=null){
                 response.close();
