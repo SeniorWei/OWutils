@@ -21,7 +21,7 @@ public class utils {
 
         InputStream in = utils.class.getClassLoader().getResourceAsStream("root.properties");
 
-       // FileInputStream in=new FileInputStream("C:/OWroot.properties");
+       //FileInputStream in=new FileInputStream("C:/OWroot.properties");
 
         prop.load(in);
 
