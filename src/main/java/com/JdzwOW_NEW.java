@@ -138,6 +138,8 @@ public class JdzwOW_NEW {
 
         }
 
+
+
     }
 
 
@@ -409,7 +411,10 @@ public class JdzwOW_NEW {
                 TimeHeart.put("xx", String.valueOf(xx));
 
                 Thread.currentThread().sleep(180000);    //180秒一次   3分钟一次
-            } catch (Exception e) {
+            } catch(java.net.SocketTimeoutException e){
+                count--;
+
+            }catch (Exception e) {
                 log.error("心跳包异常：" + e);
             }finally {
                 try {
@@ -451,8 +456,12 @@ public class JdzwOW_NEW {
             }
 
         }finally {
-            if(response!=null){
-                response.close();
+            try {
+                if(response!=null){
+                    response.close();
+                }
+            } catch (IOException e) {
+                log.error(e);
             }
         }
 
