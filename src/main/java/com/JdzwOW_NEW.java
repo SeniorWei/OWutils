@@ -45,7 +45,10 @@ public class JdzwOW_NEW {
 
     public String OW_execute() throws Exception {
         // 全局请求设置
-        RequestConfig globalConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build();
+        RequestConfig globalConfig = RequestConfig.custom()
+                .setConnectTimeout(10000)
+                .setSocketTimeout(10000)
+                .setCookieSpec(CookieSpecs.STANDARD).build();
         // 创建cookie store的本地实例
         CookieStore cookieStore = new BasicCookieStore();
         // 创建HttpClient上下文
@@ -85,7 +88,9 @@ public class JdzwOW_NEW {
 
             log.info(Hook_TimeHeartOW(PublicPost, httpClient, res, context,Host)); //维持挂机心跳包
         }finally {
-            res.close();
+            if(res!=null)
+                res.close();
+            if(httpClient!=null)
             httpClient.close();
 
         }
@@ -107,8 +112,11 @@ public class JdzwOW_NEW {
             try {
                 a.OW_execute();
             }catch (Exception e) {
-                    log.warn(e.getMessage());
-                    return;
+                e.printStackTrace();
+                log.error("顶层异常：" + e);
+                    if(e.getMessage().equals("账号密码错误")){
+                        return;
+                    }
             }
 
         }
@@ -198,8 +206,8 @@ public class JdzwOW_NEW {
             log.info("签到天数"+arrylink[1]+"  签到累计天数："+flageDay);
         }else{
             flageDay=1;
-            log.warn("签到累计结果中没有逗号");
-            log.warn("签到天数"+arrylink[1]);
+            log.info("签到累计结果中没有逗号");
+            log.info("签到天数"+arrylink[1]);
         }
 
 
@@ -319,7 +327,10 @@ public class JdzwOW_NEW {
 
         response = httpclient.execute(CookieGet, context);
 
-        response.close();
+        if(response!=null){
+            response.close();
+        }
+
 
 
         CookieGet = new HttpGet(Host+"/TCG/GameOnHook.aspx");
@@ -354,23 +365,28 @@ public class JdzwOW_NEW {
                     TimeHeart.put("imgBtnQuit.y", "10");
                     log.info("最后的心跳包：");
                     HookDoPost(Host+"/TCG/GameOnHook.aspx", TimeHeart, post, httpclient, response, context);
-                    response.close();
+                    if(response!=null){
+                        response.close();
+                    }
                     break;
                 }
 
                 log.info("第" + count + "次心跳包");
                 HookDoPost(Host+"/TCG/GameOnHook.aspx", TimeHeart, post, httpclient, response, context);
-                response.close();
+                if(response!=null){
+                    response.close();
+                }
 
                 xx -= 180;
                 TimeHeart.put("xx", String.valueOf(xx));
 
                 Thread.currentThread().sleep(180000);    //180秒一次   3分钟一次
             } catch (Exception e) {
-                e.printStackTrace();
-                log.warn(e.getMessage());
+                log.error("心跳包异常：" + e);
             }finally {
-                response.close();
+                if(response!=null){
+                    response.close();
+                }
             }
 
 
@@ -403,10 +419,11 @@ public class JdzwOW_NEW {
             }
 
         }catch (Exception e){
-            e.printStackTrace();
-            log.warn(e.getMessage());
+            log.error("发送POST异常：" + e);
         }finally {
-            response.close();
+            if(response!=null){
+                response.close();
+            }
         }
 
     }
