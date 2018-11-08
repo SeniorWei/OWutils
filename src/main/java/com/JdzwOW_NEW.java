@@ -368,6 +368,7 @@ public class JdzwOW_NEW {
                 Thread.currentThread().sleep(180000);    //180秒一次   3分钟一次
             } catch (Exception e) {
                 e.printStackTrace();
+                log.warn(e.getMessage());
             }finally {
                 response.close();
             }
@@ -403,6 +404,7 @@ public class JdzwOW_NEW {
 
         }catch (Exception e){
             e.printStackTrace();
+            log.warn(e.getMessage());
         }finally {
             response.close();
         }
