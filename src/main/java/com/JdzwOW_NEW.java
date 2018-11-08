@@ -412,9 +412,13 @@ public class JdzwOW_NEW {
 
                 Thread.currentThread().sleep(180000);    //180秒一次   3分钟一次
             } catch(java.net.SocketTimeoutException e){
+                log.error("相应超时");
                 count--;
-
-            }catch (Exception e) {
+            }catch(org.apache.http.conn.HttpHostConnectException e){
+                log.error("连接超时");
+                count--;
+            }
+            catch (Exception e) {
                 log.error("心跳包异常：" + e);
             }finally {
                 try {
