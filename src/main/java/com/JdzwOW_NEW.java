@@ -1,6 +1,8 @@
 package com;
 
-import org.apache.http.*;
+import org.apache.http.Consts;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -25,17 +27,28 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
-
 public class JdzwOW_NEW {
 
     private static final Logger log = LogManager.getLogger(JdzwOW_NEW.class);
-    private String User ;
-    private String Pas  ;
+    private String User;
+    private String Pas;
 
     private  String Host;
 
 
 
+
+    /**
+     *  构造函数
+     * 
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:54
+     * @param 
+     * @param use
+     * @param pas
+     * @param host
+     * @return 
+     */
     public JdzwOW_NEW(String use ,String pas ,String host) {
         this.User=use;
         this.Pas=pas;
@@ -43,6 +56,14 @@ public class JdzwOW_NEW {
     }
 
 
+    /**
+     *  挂机整套流程调用
+     * 
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:54
+     * @param 
+     * @return java.lang.String
+     */
     public String OW_execute() throws Exception {
         // 全局请求设置
         RequestConfig globalConfig = RequestConfig.custom()
@@ -108,9 +129,7 @@ public class JdzwOW_NEW {
         }
 
         return "远程服务调用结束";
-
-
-
+        
 
     }
 
@@ -142,7 +161,18 @@ public class JdzwOW_NEW {
 
     }
 
-
+    /**
+     *  登陆接口，用于判断账号密码是否正确
+     * 
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:54
+     * @param 
+     * @param post
+     * @param httpclient
+     * @param response
+     * @param context
+     * @return boolean
+     */
     private boolean Login_OW(HttpPost post, CloseableHttpClient httpclient, CloseableHttpResponse response, HttpClientContext context)throws IOException {
 
 
@@ -173,7 +203,18 @@ public class JdzwOW_NEW {
         return false;
     }
 
-
+    /**
+     *  签到接口
+     * 
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:55
+     * @param 
+     * @param post
+     * @param httpclient
+     * @param response
+     * @param context
+     * @return java.lang.String
+     */
     private String SiginIN_OW(HttpPost post, CloseableHttpClient httpclient, CloseableHttpResponse response, HttpClientContext context) throws IOException {
 
 
@@ -200,7 +241,18 @@ public class JdzwOW_NEW {
         return "签到" + ShowHttpResponseEntity(response);
     }
 
-
+    /**
+     *  获取累计签到状态，以及领取签到累积奖励
+     * 
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:55
+     * @param 
+     * @param post
+     * @param httpclient
+     * @param response
+     * @param context
+     * @return void
+     */
     private void SiginINGetReward(HttpPost post, CloseableHttpClient httpclient, CloseableHttpResponse response, HttpClientContext context) throws IOException {
 
         int flageDay = 0;
@@ -228,10 +280,7 @@ public class JdzwOW_NEW {
             log.info("签到累计结果中没有逗号");
             log.info("签到天数"+arrylink[1]);
         }
-
-
-
-
+        
         DateTimeFormatter formatterHour = DateTimeFormatter.ofPattern("H");
 
         LocalDateTime today = LocalDateTime.now();
@@ -259,7 +308,18 @@ public class JdzwOW_NEW {
     }
 
 
-
+    /**
+     *  获取分享奖励
+     * 
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:55
+     * @param 
+     * @param post
+     * @param httpclient
+     * @param response
+     * @param context
+     * @return java.lang.String
+     */
     private String Share_OW(HttpPost post, CloseableHttpClient httpclient, CloseableHttpResponse response, HttpClientContext context) throws IOException {
 
         StringBuilder EntityKeyOld = new StringBuilder(  "63@r&1@r&");
@@ -283,7 +343,18 @@ public class JdzwOW_NEW {
         return "分享:" + ShowInforma_OW(post,httpclient,response,context,"63@r&2","1");
     }
 
-
+    /**
+     *  探索，共有21处探索区域，每天可以探索一次，雨露均沾探索算法是  日%21+1
+     * 
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:55
+     * @param 
+     * @param post
+     * @param httpclient
+     * @param response
+     * @param context
+     * @return java.lang.String
+     */
     private   String Explore_OW(HttpPost post, CloseableHttpClient httpclient, CloseableHttpResponse response, HttpClientContext context) throws IOException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d");
         LocalDateTime today = LocalDateTime.now();
@@ -311,7 +382,27 @@ public class JdzwOW_NEW {
 
     }
 
-
+    /**
+     * 发送固定格式的POST请求
+     *
+     *  Cs13"getserverinfo"a1{s“X”“FT”@r&“USER”@r&“LT” }z
+     *
+     *  “X”为除了s“X”以外，{}中字符串的长度
+     *  “FT”为消息体前缀
+     *  “USER”为用户名
+     *  “LT”为消息体后缀
+     *
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:55
+     * @param 
+     * @param post
+     * @param httpclient
+     * @param response
+     * @param context
+     * @param type
+     * @param LastType
+     * @return java.lang.String
+     */
     private  String ShowInforma_OW(HttpPost post, CloseableHttpClient httpclient, CloseableHttpResponse response,
                                   HttpClientContext context,String type,String LastType) throws IOException {
 
@@ -334,7 +425,18 @@ public class JdzwOW_NEW {
         return "本次请求获取的信息" + ShowHttpResponseEntity(response);
     }
 
-
+    /**
+     *  发送get请求，进入挂机页面
+     * 
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:56
+     * @param 
+     * @param post
+     * @param httpclient
+     * @param response
+     * @param context
+     * @return java.lang.String
+     */
     private  String On_HookOW(HttpPost post, CloseableHttpClient httpclient, CloseableHttpResponse response, HttpClientContext context) throws IOException {
 
         StringBuilder HookURL = new StringBuilder(Host+"/TCG/href.aspx?~");
@@ -364,6 +466,19 @@ public class JdzwOW_NEW {
 
     }
 
+    /**
+     *  发送POST心跳包，维持挂机
+     * 
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:56
+     * @param 
+     * @param post
+     * @param httpclient
+     * @param response
+     * @param context
+     * @param Host
+     * @return java.lang.String
+     */
     public static String Hook_TimeHeartOW(HttpPost post, CloseableHttpClient httpclient,
                                           CloseableHttpResponse response, HttpClientContext context,
                                           String Host) throws IOException {
@@ -436,7 +551,20 @@ public class JdzwOW_NEW {
         return "挂机结束！";
     }
 
-
+    /**
+     *  模拟POST表单，发送挂机心跳包
+     * 
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:56
+     * @param 
+     * @param url
+     * @param TimeHeart
+     * @param post
+     * @param httpclient
+     * @param response
+     * @param context
+     * @return void
+     */
     public static void HookDoPost(String url, Map TimeHeart, HttpPost post,
                                   CloseableHttpClient httpclient, CloseableHttpResponse response, HttpClientContext context) throws IOException {
         try {
@@ -471,7 +599,15 @@ public class JdzwOW_NEW {
 
     }
 
-
+    /**
+     *  显示请求应答内容
+     *
+     * @author Seniorei
+     * @date 2018/11/13 0013 15:56
+     * @param
+     * @param response
+     * @return java.lang.String
+     */
     public static String ShowHttpResponseEntity(CloseableHttpResponse response) throws IOException {
         HttpEntity entity = response.getEntity();
 
@@ -491,4 +627,5 @@ public class JdzwOW_NEW {
             return "无实体";
         }
     }
+
 }
